@@ -8,11 +8,11 @@ conn.execute('''
     CREATE TABLE IF NOT EXISTS productos (
         codigo_producto INTEGER PRIMARY KEY,
         nombre TEXT NOT NULL,
-        descripcion TEXT,
+        descripcion TEXT NOT NULL,
         precio REAL NOT NULL,
         cantidad_stock INTEGER NOT NULL,
-        duracion_producto INTEGER,
-        beneficios, TEXT
+        duracion_producto INTEGER NOT NULL,
+        beneficios TEXT NOT NULL
     );
 ''')
              
@@ -20,14 +20,14 @@ conn.execute('''
             CREATE TABLE IF NOT EXISTS clientes (
                 id_cliente INTEGER PRIMARY KEY AUTOINCREMENT,
                 nombre TEXT NOT NULL,
-                direccion TEXT,
+                direccion TEXT NOT NULL,
                 correo TEXT NOT NULL,
                 telefono TEXT NOT NULL,
                 fecha_cumpleanos TEXT NOT NULL,
-                hobbies TEXT,
-                ocupacion TEXT,
-                info_primer_interaccion, TEXT,
-                molestias, TEXT
+                hobbies TEXT NOT NULL,
+                ocupacion TEXT NOT NULL,
+                info_primer_interaccion TEXT NOT NULL,
+                molestias TEXT NOT NULL
             );
 ''')
              
