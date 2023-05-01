@@ -11,7 +11,8 @@ conn.execute('''
         descripcion TEXT,
         precio REAL NOT NULL,
         cantidad_stock INTEGER NOT NULL,
-        duracion_producto INTEGER
+        duracion_producto INTEGER,
+        beneficios, TEXT
     );
 ''')
              
@@ -24,7 +25,9 @@ conn.execute('''
                 telefono TEXT NOT NULL,
                 fecha_cumpleanos TEXT NOT NULL,
                 hobbies TEXT,
-                ocupacion TEXT
+                ocupacion TEXT,
+                info_primer_interaccion, TEXT,
+                molestias, TEXT
             );
 ''')
              
