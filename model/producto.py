@@ -1,6 +1,6 @@
 import sqlite3
 
-plantilla_producto = {"nombre":"", "descripcion":"", "precio":"", "cantidad_stock":"", "duracion_producto":""}
+plantilla_producto = {"nombre":"", "descripcion":"", "precio":"", "cantidad_stock":"", "duracion_producto":"", "beneficios":""}
 
 class producto:
     def __init__(self):
