@@ -2,7 +2,9 @@ import sqlite3
 
 plantilla_producto = {"nombre":"", "descripcion":"", "precio":"", "cantidad_stock":"", "duracion_producto":"", "beneficios":""}
 
-class producto:
+columnas = ("codigo_producto", "nombre", "descripcion", "precio", "cantidad_stock", "duracion_producto", "beneficios")
+
+class Productos:
     def __init__(self):
         return None
 
@@ -12,8 +14,8 @@ class producto:
     
         with sqlite3.connect("negocio.db") as conexion:
             cursor = conexion.cursor()
-            datos = (producto.get("nombre"), producto.get("descripcion"),producto.get("precio"), producto.get("cantidad_stock"), producto.get("duracion_producto"))
-            instruccion = "insert into productos(nombre, descripcion, precio, cantidad_stock, duracion_producto) values(?,?,?,?,?);"
+            datos = (producto.get("nombre"), producto.get("descripcion"),producto.get("precio"), producto.get("cantidad_stock"), producto.get("duracion_producto"), producto.get("beneficios"))
+            instruccion = "insert into productos(nombre, descripcion, precio, cantidad_stock, duracion_producto, beneficios) values(?,?,?,?,?,?);"
             cursor.execute(instruccion, datos)
             conexion.commit()
 
@@ -46,8 +48,8 @@ class producto:
         with sqlite3.connect("negocio.db") as conexion:
             cursor = conexion.cursor()
 
-            instruccion = "update productos set nombre = ?, descripcion = ?, precio = ?, cantidad_stock = ?, duracion_producto = ? where codigo_producto = ?"
-            datos = (producto.get("nombre"), producto.get("descripcion"),producto.get("precio"), producto.get("cantidad_stock"), producto.get("duracion_producto"), codigo_producto)
+            instruccion = "update productos set nombre = ?, descripcion = ?, precio = ?, cantidad_stock = ?, duracion_producto = ?, beneficios = ? where codigo_producto = ?"
+            datos = (producto.get("nombre"), producto.get("descripcion"),producto.get("precio"), producto.get("cantidad_stock"), producto.get("duracion_producto"), producto.get("beneficios"), codigo_producto)
 
             cursor.execute(instruccion, datos)
 
