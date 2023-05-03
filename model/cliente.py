@@ -2,10 +2,11 @@ import sqlite3
 
 
 plantilla_cliente = {"nombre":"", "direccion": "", "correo": "", "telefono":"", "fecha_cumpleanos": "", "hobbies": "", "ocupacion": "", "info_primer_interaccion":"", "molestias":""}
-nombre = "nombre"
+
+columnas = ("nombre", "direccion", "correo", "telefono", "fecha_cumpleanos", "hobbies", "ocupacion", "info_primer_interaccion", "molestias")
 
 
-class cliente:
+class Clientes:
     def __init__ (self):
         return None
     
@@ -22,10 +23,12 @@ class cliente:
                 cliente.get("telefono"), 
                 cliente.get("fecha_cumpleanos"), 
                 cliente.get("hobbies"), 
-                cliente.get("ocupacion")
+                cliente.get("ocupacion"),
+                cliente.get("info_primer_interaccion"),
+                cliente.get("molestias")
             )
             
-            instruccion = "insert into clientes(nombre, direccion, correo, telefono, fecha_cumpleanos, hobbies, ocupacion) values(?,?,?,?,?,?,?);"
+            instruccion = "insert into clientes(nombre, direccion, correo, telefono, fecha_cumpleanos, hobbies, ocupacion, info_primer_interaccion, molestias) values(?,?,?,?,?,?,?,?,?);"
             cursor.execute(instruccion, datos)
             conexion.commit()
 
@@ -33,7 +36,7 @@ class cliente:
         with sqlite3.connect("negocio.db") as conexion:
             cursor = conexion.cursor()
             
-            instruccion = f"select * from clientes" if (len(dato) == 0 and len(columna) == 0) else f"select * from clientes where {columna} like ?"
+            instruccion = f"select * from clientes" if (len(dato) == 0 and len(columna) == 0) else f"select * from clientes where {columna} like %?%"
             
             cursor.execute(instruccion) if len(dato) == 0 else cursor.execute(instruccion, (f"%{dato}%",))
             resultados = cursor.fetchall()
@@ -58,8 +61,8 @@ class cliente:
         with sqlite3.connect("negocio.db") as conexion:
             cursor = conexion.cursor()
 
-            instruccion = "update clientes set nombre = ?, direccion = ?, correo = ?, telefono = ?, fecha_cumpleanos = ?, hobbies = ?, ocupacion = ? where id_cliente = ?"
-            datos = (cliente.get("nombre"), cliente.get("direccion"), cliente.get("correo"),cliente.get("telefono"), cliente.get("fecha_cumpleanos"), cliente.get("hobbies"), cliente.get("ocupacion"), id_cliente)
+            instruccion = "update clientes set nombre = ?, direccion = ?, correo = ?, telefono = ?, fecha_cumpleanos = ?, hobbies = ?, ocupacion = ?, info_primer_interaccion = ?, molestias = ? where id_cliente = ?"
+            datos = (cliente.get("nombre"), cliente.get("direccion"), cliente.get("correo"),cliente.get("telefono"), cliente.get("fecha_cumpleanos"), cliente.get("hobbies"), cliente.get("ocupacion"), cliente.get("info_primer_interaccion"), cliente.get("molestias"), id_cliente)
 
             cursor.execute(instruccion, datos)
 
