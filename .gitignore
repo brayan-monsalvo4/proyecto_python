@@ -1,2 +1,6 @@
 venv/
 __pycache__/
+*.jpg
+*.ico
+.vscode/
+*.db
