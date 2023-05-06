@@ -177,11 +177,11 @@ class CamposTexto(tk.Frame):
         self.fila_1_derecha.pack(side="top", expand=True, fill="x")
 
         tk.Label(master=self.panel_derecho, text="Contacto").pack(side="top")
-        self.campo_contacto = tk.Text(master=self.panel_derecho, height=2)
+        self.campo_contacto = tk.Text(master=self.panel_derecho, height=3)
         self.campo_contacto.pack(side="top", expand=True, fill="x")
 
         tk.Label(master=self.panel_derecho, text="Molestias").pack(side="top")
-        self.campo_molestias = tk.Text(master=self.panel_derecho, height=2)
+        self.campo_molestias = tk.Text(master=self.panel_derecho, height=3)
         self.campo_molestias.pack(side="top", expand=True, fill="x")
 
         self.panel_derecho.pack(side="right", expand=True, fill="both", padx=5)
