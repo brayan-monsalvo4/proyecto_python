@@ -21,7 +21,7 @@ class PantallaProductos(tk.Frame):
 
         self.campos_texto = CamposTexto(frame = self)
 
-        self.campos_texto.pack(side="right", pady=50, padx=50)
+        self.campos_texto.pack(side="right", padx=50, expand=True, fill="both")
 
         self.botones_salir = BotonRegresarMenu(frame=self)
         self.botones_salir.pack(side="left")
@@ -106,15 +106,14 @@ class CamposTexto(tk.Frame):
         
         
         tk.Label(master=self.panel_derecho, text="Descripcion").pack(side="top")
-        self.campo_descripcion = tk.Entry(master=self.panel_derecho)
+        self.campo_descripcion = tk.Text(master=self.panel_derecho, height=3)
 
-        self.campo_descripcion.pack(side="top", expand=True, fill="x")
+        self.campo_descripcion.pack(side="top")
 
         tk.Label(master=self.panel_derecho, text="Beneficios").pack(side="top")
-        self.campo_beneficios = tk.Entry(master=self.panel_derecho)
+        self.campo_beneficios = tk.Text(master=self.panel_derecho, height=3)
 
-        self.campo_beneficios.pack(side="top", expand=True, fill="x")
-
+        self.campo_beneficios.pack(side="top")
 
         self.panel_derecho.pack(side="right", expand=True, fill="both")
         self.panel_izquierdo.pack(side="right", expand=True, fill="both")
