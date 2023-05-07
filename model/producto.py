@@ -1,4 +1,5 @@
 import sqlite3
+from excepciones.exceptions import *
 
 plantilla_producto = {"nombre":"", "descripcion":"", "precio":"", "cantidad_stock":"", "duracion_producto":"", "beneficios":""}
 
@@ -9,9 +10,9 @@ class Productos:
         return None
 
     def registrar_producto(self, producto):
-        if(producto.keys() != plantilla_producto.keys()):
-            raise Exception("Error registrar_producto(): los campos no coinciden!")
-    
+        if set(producto.keys()) != set(plantilla_producto.keys()):
+            raise CamposIncorrectos
+        
         with sqlite3.connect("negocio.db") as conexion:
             cursor = conexion.cursor()
             datos = (producto.get("nombre"), producto.get("descripcion"),producto.get("precio"), producto.get("cantidad_stock"), producto.get("duracion_producto"), producto.get("beneficios"))
@@ -20,6 +21,9 @@ class Productos:
             conexion.commit()
 
     def consultar_producto(self, dato="", columna="") -> list:
+        if len(columna) != 0 and columna not in columnas:
+            raise CamposIncorrectos
+
         with sqlite3.connect("negocio.db") as conexion:
             cursor = conexion.cursor()
             
@@ -32,8 +36,11 @@ class Productos:
         
     def eliminar_producto(self, codigo_producto, nombre):
         if len(codigo_producto) == 0 and len(nombre) == 0:
-            raise Exception("Error eliminar_producto(): el codigo y nombre estan vacios!")
+            raise CamposVacios
         
+        if not codigo_producto.isdigit():
+            raise CodigoIncorrecto
+
         with sqlite3.connect("negocio.db") as conexion:
             cursor = conexion.cursor()
 
@@ -42,8 +49,11 @@ class Productos:
             cursor.execute(instruccion, (codigo_producto, nombre,))
 
     def actualizar_producto(self, producto, codigo_producto) :
-        if producto.keys() != plantilla_producto.keys():
-            raise Exception("Error actualizar_producto(): los campos no coinciden!")
+        if not set(producto.keys()).issubset(columnas):
+            raise CamposIncorrectos
+        
+        if not codigo_producto.isdigit():
+            raise CodigoIncorrecto
         
         with sqlite3.connect("negocio.db") as conexion:
             cursor = conexion.cursor()
