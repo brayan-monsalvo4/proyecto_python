@@ -144,13 +144,17 @@ class BotonesOperaciones(tk.Frame):
         self.boton_eliminar_producto = tk.Button(master=self, text="Eliminar producto", command=self.master.eliminar_producto)
         self.actualizar_producto = tk.Button(master=self, text="Actualizar producto", command=self.master.actualizar_producto)
         self.registrar_producto = tk.Button(master=self, text="Agregar producto", command=self.master.registrar_producto)
+        self.obtener_productos = tk.Button(master=self, text="Obtener todos los productos", command=self.master.mostrar_productos)
 
         self.boton_seleccionar_producto.pack(side="left", padx=20)
         self.campo_buscar_producto.pack(side="left", padx=10)
         self.combo_columna.pack(side="left")
 
+
+
         self.boton_buscar_producto.pack(side="left", padx=15)
         self.boton_eliminar_producto.pack(side="left", padx=15)
         self.actualizar_producto.pack(side="left", padx=15)
         self.registrar_producto.pack(side="left", padx=15)
+        self.obtener_productos.pack(side="left", padx=15)
 
