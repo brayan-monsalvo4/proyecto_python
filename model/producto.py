@@ -12,7 +12,7 @@ class Productos:
     def registrar_producto(self, producto):
         if set(producto.keys()) != set(plantilla_producto.keys()):
             raise CamposIncorrectos
-        
+
         with sqlite3.connect("negocio.db") as conexion:
             cursor = conexion.cursor()
             datos = (producto.get("nombre"), producto.get("descripcion"),producto.get("precio"), producto.get("cantidad_stock"), producto.get("duracion_producto"), producto.get("beneficios"))
@@ -34,8 +34,8 @@ class Productos:
 
             return resultados
         
-    def eliminar_producto(self, codigo_producto, nombre):
-        if len(codigo_producto) == 0 and len(nombre) == 0:
+    def eliminar_producto(self, codigo_producto):
+        if not codigo_producto:
             raise CamposVacios
         
         if not codigo_producto.isdigit():
@@ -44,9 +44,9 @@ class Productos:
         with sqlite3.connect("negocio.db") as conexion:
             cursor = conexion.cursor()
 
-            instruccion = "delete from productos where codigo_producto = ? and nombre = ?"
+            instruccion = "delete from productos where codigo_producto = ?"
 
-            cursor.execute(instruccion, (codigo_producto, nombre,))
+            cursor.execute(instruccion, (codigo_producto,))
 
     def actualizar_producto(self, producto, codigo_producto) :
         if not set(producto.keys()).issubset(columnas):
