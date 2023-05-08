@@ -6,7 +6,7 @@ conn = sqlite3.connect('negocio.db')
 # Creando una tabla 'productos'
 conn.execute('''
     CREATE TABLE IF NOT EXISTS productos (
-        codigo_producto INTEGER PRIMARY KEY,
+        codigo_producto INTEGER PRIMARY KEY AUTOINCREMENT,
         nombre TEXT NOT NULL,
         descripcion TEXT NOT NULL,
         precio REAL NOT NULL,
