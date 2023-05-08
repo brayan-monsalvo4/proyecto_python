@@ -1,41 +1,41 @@
-class InventarioVacio(Exception):
+class TablaVacia(Exception):
     def __init__(self):
-        self.message = "No hay productos en el inventario!"
+        self.message = "No hay registros en la tabla!"
         super().__init__(self.message)
 
 class CamposIncorrectos(Exception):
     def __init__(self):
-        self.message = "Producto con campos incorrectos!"
+        self.message = "registro con campos incorrectos!"
         super().__init__(self.message)
 
 class DatosIncorrectos(Exception):
     def __init__(self):
-        self.message = "Datos del producto incorrectos!"
+        self.message = "Datos del registro incorrectos!"
         super().__init__(self.message)
 
 class CamposVacios(Exception):
     def __init__(self):
-        self.message = "Producto con datos vacios!"
+        self.message = "Registro con datos vacios!"
         super().__init__(self.message)
 
-class ProductoNoEncontrado(Exception):
+class RegistroNoEncontrado(Exception):
     def __init__(self):
-        self.message = "Producto no encontrado!"
+        self.message = "Registro no encontrado!"
         super().__init__(self.message)
 
 class CodigoIncorrecto(Exception):
     def __init__(self):
-        self.message = "El codigo del producto es incorrecto!"
+        self.message = "El identificador del registro es incorrecto!"
         super().__init__(self.message)
 
-class ProductoExistente(Exception):
+class RegistroExistente(Exception):
     def __init__(self):
-        self.message = "El producto ya existe!"
+        self.message = "El registro ya existe!"
         super().__init__(self.message)
 
-class ProductoNoExistente(Exception):
+class RegistroNoExistente(Exception):
     def __init__(self):
-        self.message = "El producto no existe!"
+        self.message = "El registro no existe!"
         super().__init__(self.message)
 
         
