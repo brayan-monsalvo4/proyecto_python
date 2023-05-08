@@ -13,7 +13,7 @@ class Productos:
         if set(producto.keys()) != set(plantilla_producto.keys()):
             raise CamposIncorrectos
 
-        self.__comprobar_datos_vacios(datos_producto=producto)
+        self.__verificar_datos(datos_producto=producto)
 
         if self.existe_producto(datos_producto=producto):
             raise ProductoExistente
@@ -30,7 +30,7 @@ class Productos:
         if len(datos_producto) != 0 and not set(datos_producto.keys()).issubset(columnas):
             raise CamposIncorrectos
         
-        self.__comprobar_datos_vacios(datos_producto=datos_producto)
+        self.__verificar_datos(datos_producto=datos_producto)
         
         with sqlite3.connect("negocio.db") as conexion:
             datos = tuple(map(lambda dato: dato.strip(), datos_producto.values()))
@@ -49,7 +49,9 @@ class Productos:
         if not codigo_producto:
             raise CamposVacios
         
-        if not codigo_producto.isdigit():
+        try:
+            res = codigo_producto.isdigit()
+        except AttributeError as e:
             raise CodigoIncorrecto
         
         if not self.existe_producto({"codigo_producto":codigo_producto}):\
@@ -66,10 +68,12 @@ class Productos:
         if set(producto.keys()) != set(plantilla_producto.keys()):
             raise CamposIncorrectos
         
-        if not codigo_producto.isdigit():
+        try:
+            res = codigo_producto.isdigit()
+        except AttributeError as e:
             raise CodigoIncorrecto
         
-        self.__comprobar_datos_vacios(datos_producto=producto)
+        self.__verificar_datos(datos_producto=producto)
 
         if not self.existe_producto({"codigo_producto":codigo_producto}):
             raise ProductoNoExistente
@@ -88,7 +92,7 @@ class Productos:
         if not set(datos_producto.keys()).issubset(columnas):
             raise CamposIncorrectos
 
-        self.__comprobar_datos_vacios(datos_producto=datos_producto)
+        self.__verificar_datos(datos_producto=datos_producto)
         
         return len( self.consultar_producto(datos_producto=datos_producto)) != 0
 
@@ -108,8 +112,14 @@ class Productos:
 
         return sql
 
-    def __comprobar_datos_vacios(self, datos_producto):
-        lista_comprobacion = list(map(lambda dato: dato.strip(), datos_producto.values()))
+    def __verificar_datos(self, datos_producto):
+        lista_comprobacion = list()
+
+        try:
+            lista_comprobacion = list(map(lambda dato: dato.strip(), datos_producto.values()))
+        except AttributeError:
+            raise DatosIncorrectos
+        
         lista_comprobacion = list( filter(lambda dato: len(dato) != 0, lista_comprobacion) )
 
         if len(datos_producto) != len(lista_comprobacion):
