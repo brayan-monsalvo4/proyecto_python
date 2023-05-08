@@ -1,9 +1,9 @@
 import sqlite3
-
+from excepciones.exceptions import *
 
 plantilla_cliente = {"nombre":"", "direccion": "", "correo": "", "telefono":"", "fecha_cumpleanos": "", "hobbies": "", "ocupacion": "", "info_primer_interaccion":"", "molestias":""}
 
-columnas = ("nombre", "direccion", "correo", "telefono", "fecha_cumpleanos", "hobbies", "ocupacion", "info_primer_interaccion", "molestias")
+columnas = ("id_cliente" ,"nombre", "direccion", "correo", "telefono", "fecha_cumpleanos", "hobbies", "ocupacion", "info_primer_interaccion", "molestias")
 
 
 class Clientes:
@@ -11,65 +11,120 @@ class Clientes:
         return None
     
     def registrar_cliente(self, cliente):
-        if(cliente.keys() != plantilla_cliente.keys()):
-            raise Exception("Error registrar_cliente(): los campos no coinciden!")
+        if set(cliente.keys()) != set(plantilla_cliente.keys()):
+            raise CamposIncorrectos
+        
+        self.__verificar_datos(datos_cliente=cliente)
+
+        if self.existe_cliente(datos_cliente=cliente):
+            raise ProductoExistente
         
         with sqlite3.connect("negocio.db") as conexion:
+            datos = tuple(map(lambda dato: dato.strip(), cliente.values()))
+
             cursor = conexion.cursor()
-            datos = (
-                cliente.get("nombre"), 
-                cliente.get("direccion"), 
-                cliente.get("correo"),
-                cliente.get("telefono"), 
-                cliente.get("fecha_cumpleanos"), 
-                cliente.get("hobbies"), 
-                cliente.get("ocupacion"),
-                cliente.get("info_primer_interaccion"),
-                cliente.get("molestias")
-            )
             
             instruccion = "insert into clientes(nombre, direccion, correo, telefono, fecha_cumpleanos, hobbies, ocupacion, info_primer_interaccion, molestias) values(?,?,?,?,?,?,?,?,?);"
             cursor.execute(instruccion, datos)
             conexion.commit()
 
-    def consultar_cliente(self, dato="", columna="") -> list:
+    def consultar_cliente(self, datos_cliente={}) -> list:
+        if len(datos_cliente) != 0 and not set(datos_cliente.keys()).issubset(columnas):
+            raise CamposIncorrectos
+
+        self.__verificar_datos(datos_cliente=datos_cliente)
+
+
         with sqlite3.connect("negocio.db") as conexion:
+            datos = tuple(map(lambda dato: dato.strip(), datos_cliente.values()))
+
             cursor = conexion.cursor()
             
-            instruccion = f"select * from clientes" if (len(dato) == 0 and len(columna) == 0) else f"select * from clientes where {columna} like %?%"
-            
-            cursor.execute(instruccion) if len(dato) == 0 else cursor.execute(instruccion, (f"%{dato}%",))
+            instruccion = self.__generar_select_dinamico(datos_cliente=datos_cliente)
+
+            cursor.execute(instruccion, datos)
+
             resultados = cursor.fetchall()
 
             return resultados
         
-    def eliminar_cliente(self, id_cliente, nombre_cliente):
-        if len(id_cliente) == 0 and len(nombre_cliente) == 0:
-            raise Exception("Error eliminar_cliente(): el id y el nombre estan vacios!")
-        
+    def eliminar_cliente(self, id_cliente):
+        if not id_cliente:
+            raise CamposVacios
+            
+        try:
+            res = id_cliente.isdigit()
+        except AttributeError as e:
+            raise CodigoIncorrecto
+
+        if not self.existe_cliente({"id_cliente":id_cliente}):
+            raise ProductoExistente
+
         with sqlite3.connect("negocio.db") as conexion:
             cursor = conexion.cursor()
 
-            instruccion = "delete from clientes where id_cliente = ? and nombre = ?"
+            instruccion = "delete from clientes where id_cliente = ?"
 
-            cursor.execute(instruccion, (id_cliente, nombre_cliente,))
+            cursor.execute(instruccion, (id_cliente,))
 
     def actualizar_cliente(self, cliente, id_cliente) :
-        if cliente.keys() != plantilla_cliente.keys():
-            raise Exception("Error actualizar_cliente(): los campos no coinciden!")
-        
+        if set(cliente.keys()) != set(plantilla_cliente.keys()):
+            raise CamposIncorrectos
+
+        try:
+            res = id_cliente.isdigit()
+        except AttributeError as e:
+            raise CodigoIncorrecto   
+
+        self.__verificar_datos(datos_cliente=cliente)
+
+        if not self.existe_cliente({"id_cliente":id_cliente}):
+            raise ProductoNoExistente
+
         with sqlite3.connect("negocio.db") as conexion:
+            datos = list(map(lambda dato: dato.strip(), cliente.values()))
             cursor = conexion.cursor()
 
             instruccion = "update clientes set nombre = ?, direccion = ?, correo = ?, telefono = ?, fecha_cumpleanos = ?, hobbies = ?, ocupacion = ?, info_primer_interaccion = ?, molestias = ? where id_cliente = ?"
-            datos = (cliente.get("nombre"), cliente.get("direccion"), cliente.get("correo"),cliente.get("telefono"), cliente.get("fecha_cumpleanos"), cliente.get("hobbies"), cliente.get("ocupacion"), cliente.get("info_primer_interaccion"), cliente.get("molestias"), id_cliente)
+
+            datos.append(id_cliente)
 
             cursor.execute(instruccion, datos)
 
-    def existe_cliente(self, dato, columna) -> bool :
-        if len(dato) == 0 and len(columna) == 0:
-            raise Exception("Error existe_cliente(): id_cliente y nombre vacios!")
-        
-        resultados = self.consultar_cliente(dato=dato, columna=columna)
+    def existe_cliente(self, datos_cliente) -> bool :
+        if not set(datos_cliente.keys()).issubset(columnas):
+            print(datos_cliente.keys(), columnas.keys())
+            raise CamposIncorrectos
 
-        return len(resultados) != 0
+        self.__verificar_datos(datos_cliente=datos_cliente)
+
+        return len(self.consultar_cliente(datos_cliente=datos_cliente)) != 0
+
+    def __generar_select_dinamico(self, datos_cliente):
+        sql = "select * from clientes"
+
+        if datos_cliente:
+            sql += " where"
+
+            for indice, tupla in enumerate(datos_cliente.items()):
+                sql += f" {tupla[0]} = ? "
+
+                if not indice == len(datos_cliente)-1:
+                    sql += "and"
+
+        sql += ";"
+
+        return sql
+
+    def __verificar_datos(self, datos_cliente):
+        lista_comprobacion = list()
+
+        try:
+            lista_comprobacion = list(map(lambda dato: dato.strip(), datos_cliente.values()))
+        except AttributeError:
+            raise DatosIncorrectos
+        
+        lista_comprobacion = list(filter(lambda dato: len(dato) != 0, lista_comprobacion))
+
+        if len(datos_cliente) != len(lista_comprobacion):
+            raise CamposVacios
