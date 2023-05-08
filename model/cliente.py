@@ -17,7 +17,7 @@ class Clientes:
         self.__verificar_datos(datos_cliente=cliente)
 
         if self.existe_cliente(datos_cliente=cliente):
-            raise ProductoExistente
+            raise RegistroExistente
         
         with sqlite3.connect("negocio.db") as conexion:
             datos = tuple(map(lambda dato: dato.strip(), cliente.values()))
@@ -58,7 +58,7 @@ class Clientes:
             raise CodigoIncorrecto
 
         if not self.existe_cliente({"id_cliente":id_cliente}):
-            raise ProductoExistente
+            raise RegistroNoExistente
 
         with sqlite3.connect("negocio.db") as conexion:
             cursor = conexion.cursor()
@@ -79,7 +79,7 @@ class Clientes:
         self.__verificar_datos(datos_cliente=cliente)
 
         if not self.existe_cliente({"id_cliente":id_cliente}):
-            raise ProductoNoExistente
+            raise RegistroNoExistente
 
         with sqlite3.connect("negocio.db") as conexion:
             datos = list(map(lambda dato: dato.strip(), cliente.values()))
