@@ -13,33 +13,47 @@ class Productos:
         if set(producto.keys()) != set(plantilla_producto.keys()):
             raise CamposIncorrectos
 
+        self.__comprobar_datos_vacios(datos_producto=producto)
+
+        if self.existe_producto(datos_producto=producto):
+            raise ProductoExistente
+
         with sqlite3.connect("negocio.db") as conexion:
+            datos = tuple(map(lambda dato: dato.strip(), producto.values()))
+
             cursor = conexion.cursor()
-            datos = (producto.get("nombre"), producto.get("descripcion"),producto.get("precio"), producto.get("cantidad_stock"), producto.get("duracion_producto"), producto.get("beneficios"))
             instruccion = "insert into productos(nombre, descripcion, precio, cantidad_stock, duracion_producto, beneficios) values(?,?,?,?,?,?);"
             cursor.execute(instruccion, datos)
             conexion.commit()
-
-    def consultar_producto(self, dato="", columna="") -> list:
-        if len(columna) != 0 and columna not in columnas:
+    
+    def consultar_producto(self, datos_producto={}) -> list:
+        if len(datos_producto) != 0 and not set(datos_producto.keys()).issubset(columnas):
             raise CamposIncorrectos
-
+        
+        self.__comprobar_datos_vacios(datos_producto=datos_producto)
+        
         with sqlite3.connect("negocio.db") as conexion:
+            datos = tuple(map(lambda dato: dato.strip(), datos_producto.values()))
+
             cursor = conexion.cursor()
-            
-            instruccion = f"select * from productos" if (len(dato) == 0 and len(columna) == 0) else f"select * from productos where {columna} like ?"
-            
-            cursor.execute(instruccion) if len(dato) == 0 else cursor.execute(instruccion, (f"%{dato}%",))
+
+            instruccion = self.__generar_select_dinamico(datos_producto=datos_producto)
+
+            cursor.execute(instruccion, datos)
+
             resultados = cursor.fetchall()
 
             return resultados
-        
+
     def eliminar_producto(self, codigo_producto):
         if not codigo_producto:
             raise CamposVacios
         
         if not codigo_producto.isdigit():
             raise CodigoIncorrecto
+        
+        if not self.existe_producto({"codigo_producto":codigo_producto}):\
+            raise ProductoNoExistente
 
         with sqlite3.connect("negocio.db") as conexion:
             cursor = conexion.cursor()
@@ -49,24 +63,54 @@ class Productos:
             cursor.execute(instruccion, (codigo_producto,))
 
     def actualizar_producto(self, producto, codigo_producto) :
-        if not set(producto.keys()).issubset(columnas):
+        if set(producto.keys()) != set(plantilla_producto.keys()):
             raise CamposIncorrectos
         
         if not codigo_producto.isdigit():
             raise CodigoIncorrecto
         
+        self.__comprobar_datos_vacios(datos_producto=producto)
+
+        if not self.existe_producto({"codigo_producto":codigo_producto}):
+            raise ProductoNoExistente
+        
         with sqlite3.connect("negocio.db") as conexion:
+            datos = list(map(lambda dato: dato.strip(), producto.values()))
             cursor = conexion.cursor()
 
             instruccion = "update productos set nombre = ?, descripcion = ?, precio = ?, cantidad_stock = ?, duracion_producto = ?, beneficios = ? where codigo_producto = ?"
-            datos = (producto.get("nombre"), producto.get("descripcion"),producto.get("precio"), producto.get("cantidad_stock"), producto.get("duracion_producto"), producto.get("beneficios"), codigo_producto)
+
+            datos.append(codigo_producto)
 
             cursor.execute(instruccion, datos)
-
-    def existe_producto(self, dato, columna) -> bool :
-        if len(dato) == 0 and len(columna) == 0:
-            raise Exception("Error existe_producto(): el dato y la columna estan vacios!")
         
-        resultados = self.consultar_producto(dato=dato, columna=columna)
+    def existe_producto(self, datos_producto) -> bool:
+        if not set(datos_producto.keys()).issubset(columnas):
+            raise CamposIncorrectos
 
-        return len(resultados) != 0
+        self.__comprobar_datos_vacios(datos_producto=datos_producto)
+        
+        return len( self.consultar_producto(datos_producto=datos_producto)) != 0
+
+    def __generar_select_dinamico(self, datos_producto):
+        sql = "select * from productos"
+
+        if datos_producto:
+            sql +=" where"
+
+            for indice, tupla in enumerate(datos_producto.items()):
+                sql += f" {tupla[0]} = ?  "
+
+                if not indice == len(datos_producto)-1:
+                    sql += "and"
+
+        sql += ";"
+
+        return sql
+
+    def __comprobar_datos_vacios(self, datos_producto):
+        lista_comprobacion = list(map(lambda dato: dato.strip(), datos_producto.values()))
+        lista_comprobacion = list( filter(lambda dato: len(dato) != 0, lista_comprobacion) )
+
+        if len(datos_producto) != len(lista_comprobacion):
+            raise CamposVacios
