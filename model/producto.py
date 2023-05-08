@@ -16,7 +16,7 @@ class Productos:
         self.__verificar_datos(datos_producto=producto)
 
         if self.existe_producto(datos_producto=producto):
-            raise ProductoExistente
+            raise RegistroExistente
 
         with sqlite3.connect("negocio.db") as conexion:
             datos = tuple(map(lambda dato: dato.strip(), producto.values()))
@@ -55,7 +55,7 @@ class Productos:
             raise CodigoIncorrecto
         
         if not self.existe_producto({"codigo_producto":codigo_producto}):\
-            raise ProductoNoExistente
+            raise RegistroNoExistente
 
         with sqlite3.connect("negocio.db") as conexion:
             cursor = conexion.cursor()
@@ -76,7 +76,7 @@ class Productos:
         self.__verificar_datos(datos_producto=producto)
 
         if not self.existe_producto({"codigo_producto":codigo_producto}):
-            raise ProductoNoExistente
+            raise RegistroNoExistente
         
         with sqlite3.connect("negocio.db") as conexion:
             datos = list(map(lambda dato: dato.strip(), producto.values()))
