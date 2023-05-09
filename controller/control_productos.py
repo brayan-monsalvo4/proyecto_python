@@ -2,23 +2,30 @@ from excepciones.exceptions import *
 from model.producto import Productos as prod
 from model.producto import columnas as columnas_producto
 
-__productos = prod()
+
 
 class ControlProductos:
+    __productos = prod()
+
     def __init__(self) -> None:
         return None
 
-    def obtener_productos(self) -> list:
-        return []
-    
-    def actualizar_producto(self, producto):
-        print("actualizar producto")
+    def obtener_productos(self, datos_producto={}) -> list:
+        self.verificar_datos(datos_producto=datos_producto)
+        return self.__productos.consultar_producto(datos_producto=datos_producto)
+
+    def actualizar_producto(self, producto, codigo_producto):
+        self.verificar_datos(datos_producto=producto)
+        self.__productos.actualizar_producto(producto=producto, codigo_producto=codigo_producto)
 
     def registrar_producto(self, producto):
-        print("registrar producto")
+        self.verificar_datos(producto)
+        self.__productos.registrar_producto(producto=producto)
 
-    def eliminar_producto(self):
-        print("eliminar producto")
+    def eliminar_producto(self, codigo_producto):
+        self.verificar_datos(datos_producto={"codigo_producto":f"{codigo_producto}"})
+
+        self.__productos.eliminar_producto(codigo_producto=codigo_producto)
 
     def verificar_datos(self, datos_producto):
         lista_comprobacion = list()
