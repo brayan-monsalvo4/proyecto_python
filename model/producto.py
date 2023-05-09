@@ -103,7 +103,7 @@ class Productos:
             sql +=" where"
 
             for indice, tupla in enumerate(datos_producto.items()):
-                sql += f" {tupla[0]} = ?  "
+                sql += f" {tupla[0]} LIKE '%' || ? || '%'"
 
                 if not indice == len(datos_producto)-1:
                     sql += "and"
