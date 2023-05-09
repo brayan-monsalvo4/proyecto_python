@@ -107,7 +107,7 @@ class Clientes:
             sql += " where"
 
             for indice, tupla in enumerate(datos_cliente.items()):
-                sql += f" {tupla[0]} = ? "
+                sql += f" {tupla[0]} LIKE '%' || ? || '%'"
 
                 if not indice == len(datos_cliente)-1:
                     sql += "and"
