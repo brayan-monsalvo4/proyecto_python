@@ -22,7 +22,9 @@ class Productos:
             datos = tuple(map(lambda dato: dato.strip(), producto.values()))
 
             cursor = conexion.cursor()
-            instruccion = "insert into productos(nombre, descripcion, precio, cantidad_stock, duracion_producto, beneficios) values(?,?,?,?,?,?);"
+
+            campos = ",".join(producto.keys())
+            instruccion = f"insert into productos({campos}) values(?,?,?,?,?,?);"
             cursor.execute(instruccion, datos)
             conexion.commit()
     
@@ -43,7 +45,15 @@ class Productos:
 
             resultados = cursor.fetchall()
 
-            return resultados
+            respuesta = list()
+
+            for registro in resultados:
+                respuesta.append({})
+
+                for columna, dato in zip(columnas, registro):
+                    respuesta[-1].update( {columna: dato} )
+
+            return respuesta
 
     def eliminar_producto(self, codigo_producto):
         if not codigo_producto:
@@ -54,7 +64,7 @@ class Productos:
         except AttributeError as e:
             raise CodigoIncorrecto
         
-        if not self.existe_producto({"codigo_producto":codigo_producto}):\
+        if not self.existe_producto({"codigo_producto":codigo_producto}):
             raise RegistroNoExistente
 
         with sqlite3.connect("negocio.db") as conexion:
@@ -82,7 +92,8 @@ class Productos:
             datos = list(map(lambda dato: dato.strip(), producto.values()))
             cursor = conexion.cursor()
 
-            instruccion = "update productos set nombre = ?, descripcion = ?, precio = ?, cantidad_stock = ?, duracion_producto = ?, beneficios = ? where codigo_producto = ?"
+            #instruccion = "update productos set nombre = ?, descripcion = ?, precio = ?, cantidad_stock = ?, duracion_producto = ?, beneficios = ? where codigo_producto = ?"
+            instruccion = self.__generar_update_dinamico(datos_producto=producto)
 
             datos.append(codigo_producto)
 
@@ -100,15 +111,28 @@ class Productos:
         sql = "select * from productos"
 
         if datos_producto:
-            sql +=" where"
+            sql +=" where "
 
             for indice, tupla in enumerate(datos_producto.items()):
-                sql += f" {tupla[0]} LIKE '%' || ? || '%'"
+                sql += f" { tupla[0] } LIKE '%' || ? || '%' "
 
                 if not indice == len(datos_producto)-1:
                     sql += "and"
 
         sql += ";"
+
+        return sql
+
+    def __generar_update_dinamico(self, datos_producto):
+        sql = "update productos set "
+
+        for indice, campo in enumerate(datos_producto.keys()):
+            sql += f" {campo} = ? "
+
+            if not indice == len(datos_producto)-1:
+                sql += ","
+
+        sql += " where codigo_producto = ?"
 
         return sql
 
