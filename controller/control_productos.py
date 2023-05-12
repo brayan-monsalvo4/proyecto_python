@@ -6,21 +6,27 @@ from model.producto import columnas as columnas_producto
 
 class ControlProductos:
     __productos = prod()
+    plantilla_producto = {"nombre":"", "descripcion":"", "precio":"", "cantidad_stock":"", "duracion_producto":"", "beneficios":""}
+    columnas = ("codigo_producto", "nombre", "descripcion", "precio", "cantidad_stock", "duracion_producto", "beneficios")
+    columnas_campoos = ("nombre", "descripcion", "precio", "cantidad_stock", "duracion_producto", "beneficios")
 
     def __init__(self) -> None:
         return None
 
     def obtener_productos(self, datos_producto={}) -> list:
         self.verificar_datos(datos_producto=datos_producto)
-        return self.__productos.consultar_producto(datos_producto=datos_producto)
+        correccion = self.__corregir_datos(datos_producto=datos_producto)
+        return self.__productos.consultar_producto(datos_producto=correccion)
 
     def actualizar_producto(self, producto, codigo_producto):
         self.verificar_datos(datos_producto=producto)
-        self.__productos.actualizar_producto(producto=producto, codigo_producto=codigo_producto)
+        correccion = self.__corregir_datos(datos_producto=producto)
+        self.__productos.actualizar_producto(producto=correccion, codigo_producto=codigo_producto)
 
     def registrar_producto(self, producto):
         self.verificar_datos(producto)
-        self.__productos.registrar_producto(producto=producto)
+        correccion = self.__corregir_datos(datos_producto=producto)
+        self.__productos.registrar_producto(producto=correccion)
 
     def eliminar_producto(self, codigo_producto):
         self.verificar_datos(datos_producto={"codigo_producto":f"{codigo_producto}"})
@@ -56,3 +62,22 @@ class ControlProductos:
 
             except ValueError:
                 raise DatosIncorrectos
+            
+    def __corregir_datos(self, datos_producto) -> dict:
+        corregido = dict()
+
+        if len( datos_producto ) == 1:
+            for clave, valor in datos_producto.items():
+                corregido.update({clave : valor})
+
+                return corregido
+            
+        if not datos_producto:
+            return {}
+
+        for clave, valor in datos_producto.items():
+            #if clave == ""
+            corregido.update({ clave : valor.upper() })
+
+        return corregido
+
