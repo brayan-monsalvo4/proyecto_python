@@ -60,9 +60,10 @@ class PantallaClientes(tk.Frame):
             self.__clientes.eliminar_cliente( id_cliente= str( self.seleccion_actual[0] ) )
             self.tabla.limpiar_tabla()
             self.campos_texto.limpiar_campos()
-            messagebox.showinfo(title="Éxito", message="el cliente se eliminó exitosamente!")
+            messagebox.showinfo(title="Éxito", message="El cliente se eliminó exitosamente!")
             self.mostrar_clientes()
         except CamposVacios:
+            self.seleccion_actual = None
             messagebox.showerror(title="Error", message="Los campos no pueden estar vacios!")
             return None
 
@@ -127,6 +128,7 @@ class PantallaClientes(tk.Frame):
         
         if len( registros_clientes ) == 0:
             messagebox.showinfo(title="Info", message="No hay clientes!")
+            self.seleccion_actual = None
             return None
 
         self.tabla.limpiar_tabla()
@@ -148,7 +150,6 @@ class PantallaClientes(tk.Frame):
         except IndexError:
             messagebox.showerror(title="Error", message="Seleccione primero una fila!")
 
-            
 class TablaClientes(tk.Frame):
     def __init__(self, frame):
         super().__init__(master=frame)
@@ -171,8 +172,7 @@ class TablaClientes(tk.Frame):
         self.tabla_clientes.heading("#0", anchor="center")
 
         for num, campo in enumerate(cl.columnas):
-            self.tabla_clientes.heading(
-                f"#{num+1}", text=campo, anchor="center")
+            self.tabla_clientes.heading(f"#{num+1}", text=campo, anchor="center")
         
         self.tabla_clientes.pack()
 
@@ -440,21 +440,14 @@ class BotonesOperaciones(tk.Frame):
 
         self.boton_buscar_cliente = tk.Button(
             master=self, text="Buscar cliente", command=self.master.buscar_cliente)
-        self.boton_eliminar_cliente = tk.Button(
-            master=self, text="Eliminar cliente", command=self.master.eliminar_cliente)
-        self.actualizar_cliente = tk.Button(
-            master=self, text="Actualizar cliente", command=self.master.actualizar_cliente)
-        self.registrar_cliente = tk.Button(
-            master=self, text="Agregar cliente", command=self.master.registrar_cliente)
-        self.boton_consultar_clientes = tk.Button(
-            master=self, text="Consultar todos los clientes", command=self.master.mostrar_clientes
-        )
+        self.boton_eliminar_cliente = tk.Button(master=self, text="Eliminar cliente", command=self.master.eliminar_cliente)
+        self.actualizar_cliente = tk.Button(master=self, text="Actualizar cliente", command=self.master.actualizar_cliente)
+        self.registrar_cliente = tk.Button(master=self, text="Agregar cliente", command=self.master.registrar_cliente)
+        self.boton_consultar_clientes = tk.Button(master=self, text="Consultar todos los clientes", command=self.master.mostrar_clientes)
 
-        self.boton_limpiar_campos = tk.Button(
-            master=self, text="Limpiar campos", command=self.master.campos_texto.limpiar_campos
-        )
+        self.boton_limpiar_campos = tk.Button(master=self, text="Limpiar campos", command=self.master.campos_texto.limpiar_campos)
 
-        self.boton_seleccionar_cliente.pack(side="left", padx=20)
+        self.boton_seleccionar_cliente.pack(side="left", padx=10)
         self.campo_buscar_cliente.pack(side="left", padx=10)
         self.combo_columna.pack(side="left")
 
