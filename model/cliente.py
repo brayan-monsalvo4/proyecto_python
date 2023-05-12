@@ -5,7 +5,6 @@ plantilla_cliente = {"nombre":"", "direccion": "", "correo": "", "telefono":"", 
 
 columnas = ("id_cliente" ,"nombre", "direccion", "correo", "telefono", "fecha_cumpleanos", "hobbies", "ocupacion", "info_primer_interaccion", "molestias")
 
-
 class Clientes:
     def __init__ (self):
         return None
@@ -18,13 +17,22 @@ class Clientes:
 
         if self.existe_cliente(datos_cliente=cliente):
             raise RegistroExistente
+
+        if self.existe_cliente(datos_cliente= {"correo" : cliente.get("correo")}):
+            raise RegistroExistente 
+        
+        if self.existe_cliente(datos_cliente= {"telefono" : cliente.get("telefono")}):
+            raise RegistroExistente 
+        
         
         with sqlite3.connect("negocio.db") as conexion:
             datos = tuple(map(lambda dato: dato.strip(), cliente.values()))
 
             cursor = conexion.cursor()
             
-            instruccion = "insert into clientes(nombre, direccion, correo, telefono, fecha_cumpleanos, hobbies, ocupacion, info_primer_interaccion, molestias) values(?,?,?,?,?,?,?,?,?);"
+            campos = ",".join( cliente.keys() )
+
+            instruccion = f"insert into clientes({campos}) values(?,?,?,?,?,?,?,?,?);"
             cursor.execute(instruccion, datos)
             conexion.commit()
 
@@ -46,8 +54,16 @@ class Clientes:
 
             resultados = cursor.fetchall()
 
-            return resultados
-        
+            respuesta = list()
+
+            for registro in resultados:
+                    respuesta.append({})
+
+                    for columna, dato in zip( columnas, registro ):
+                        respuesta[-1].update({ columna: dato })
+                    
+            return respuesta
+
     def eliminar_cliente(self, id_cliente):
         if not id_cliente:
             raise CamposVacios
@@ -85,7 +101,11 @@ class Clientes:
             datos = list(map(lambda dato: dato.strip(), cliente.values()))
             cursor = conexion.cursor()
 
-            instruccion = "update clientes set nombre = ?, direccion = ?, correo = ?, telefono = ?, fecha_cumpleanos = ?, hobbies = ?, ocupacion = ?, info_primer_interaccion = ?, molestias = ? where id_cliente = ?"
+            #instruccion = "update clientes set nombre = ?, direccion = ?, correo = ?, telefono = ?, fecha_cumpleanos = ?, hobbies = ?, ocupacion = ?, info_primer_interaccion = ?, molestias = ? where id_cliente = ?"
+
+            instruccion = self.__generar_update_dinamico(datos_cliente=cliente)
+
+            print("instruccion:", instruccion)
 
             datos.append(id_cliente)
 
@@ -98,21 +118,36 @@ class Clientes:
 
         self.__verificar_datos(datos_cliente=datos_cliente)
 
+        print(len(self.consultar_cliente(datos_cliente=datos_cliente)))
+
         return len(self.consultar_cliente(datos_cliente=datos_cliente)) != 0
 
-    def __generar_select_dinamico(self, datos_cliente):
+    def __generar_select_dinamico(self, datos_cliente) -> str:
         sql = "select * from clientes"
 
         if datos_cliente:
-            sql += " where"
+            sql += " where "
 
             for indice, tupla in enumerate(datos_cliente.items()):
-                sql += f" {tupla[0]} LIKE '%' || ? || '%'"
+                sql += f" {tupla[0]} LIKE '%' || ? || '%' "
 
                 if not indice == len(datos_cliente)-1:
                     sql += "and"
 
         sql += ";"
+
+        return sql
+    
+    def __generar_update_dinamico(self, datos_cliente) -> str:
+        sql = "update clientes set "
+
+        for indice, campo in enumerate(datos_cliente.keys()):
+            sql += f" {campo} = ?"
+
+            if not indice == len(datos_cliente)-1:
+                sql += ","
+
+        sql += " where id_cliente = ?"
 
         return sql
 
