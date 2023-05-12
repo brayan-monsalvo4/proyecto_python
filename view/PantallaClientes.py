@@ -50,6 +50,13 @@ class PantallaClientes(tk.Frame):
 
         try:
             self.campos_texto.comprobar_campos_vacios()
+
+            res = messagebox.askyesnocancel(title="?", message="Quiere eliminar el cliente?")
+
+            if not res or res is None:
+                self.seleccion_actual = None
+                return None
+
             self.__clientes.eliminar_cliente( id_cliente= str( self.seleccion_actual[0] ) )
             self.tabla.limpiar_tabla()
             self.campos_texto.limpiar_campos()
@@ -71,7 +78,7 @@ class PantallaClientes(tk.Frame):
 
             self.campos_texto.limpiar_campos()
 
-            self.tabla.obtener_clientes(lista_clientes= self.__clientes.obtener_clientes() )
+            self.mostrar_clientes()
 
             messagebox.showinfo(title="Éxito", message="el cliente se registró exitosamente!")
         except CamposVacios:
@@ -94,6 +101,11 @@ class PantallaClientes(tk.Frame):
             self.campos_texto.comprobar_campos_vacios()
             datos = self.campos_texto.obtener_datos()
 
+            res = messagebox.askyesnocancel(title="?", message="Quiere actualizar el cliente?")
+
+            if not res or res is None:
+                self.seleccion_actual = None
+                return None
 
             self.__clientes.actualizar_cliente( cliente=datos, id_cliente=str( self.seleccion_actual[0] ) )
             self.campos_texto.limpiar_campos()
@@ -336,8 +348,6 @@ class CamposTexto(tk.Frame):
         self.campo_codigo_postal.delete(0, "end")
         self.campo_ciudad.delete(0, "end")
         self.campo_estado.delete(0, "end")
-
-        self.master.seleccion_actual = None
 
     def comprobar_campos_vacios(self):
         if not self.campo_nombre.get().strip():
