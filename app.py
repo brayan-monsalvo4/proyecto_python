@@ -10,7 +10,7 @@ class Root(tk.Tk):
         tk.Tk.__init__(self)
         self._frame = None
         self.title = "Negocio Aromaterapia"
-        self.geometry("900x500")
+        self.geometry("300x200")
         self.protocol("WM_DELETE_WINDOW", self.__cerrar)
         self.resizable = True 
 
