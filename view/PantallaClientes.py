@@ -32,7 +32,11 @@ class PantallaClientes(tk.Frame):
             messagebox.showerror("Error", "El campo no puede estar vacío!")
             return None
 
-        resultado = self.__clientes.obtener_clientes(datos_cliente= {campo_busqueda:parametro_busqueda})
+        try:
+            resultado = self.__clientes.obtener_clientes(datos_cliente= {campo_busqueda:parametro_busqueda})
+        except DatosIncorrectos:
+            messagebox.showerror(title="Error", message="Datos incorrectos!")
+            return None
 
         if not resultado:
             messagebox.showinfo(title="Info", message="No se encontró!")
