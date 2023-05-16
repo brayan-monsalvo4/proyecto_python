@@ -34,7 +34,14 @@ class PantallaProductos(tk.Frame):
             messagebox.showerror("Error", "El campo no puede estar vacío!")
             return None
         
-        resultado = self.__productos.obtener_productos(datos_producto={campo_busqueda : parametro_busqueda})
+        #resultado = self.__productos.obtener_productos(datos_producto={campo_busqueda : parametro_busqueda})
+
+        try:
+            resultado = self.__productos.obtener_productos( {campo_busqueda : parametro_busqueda} )
+        
+        except DatosIncorrectos:
+            messagebox.showerror(title="Error", message="Datos incorrectos!")
+            return None
 
         if not resultado:
             messagebox.showinfo(title="Info", message="No se encontró!")
