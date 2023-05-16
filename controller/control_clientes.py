@@ -43,9 +43,6 @@ class ControlClientes:
             else:
                 return False
 
-        if len(datos_cliente) == 1:
-            return None
-
         lista_comprobacion = list()
 
         try:
@@ -60,6 +57,11 @@ class ControlClientes:
         
         for columna, valor in datos_cliente.items():
             try:
+                if columna == "id_cliente":
+                    print(columna)
+                    print(valor)
+                    int ( valor )
+
                 if columna == "telefono":
                     int ( valor )
 
